@@ -34,7 +34,7 @@
   - Add repository url to local project
     - Example using HTTPS: ` git remote add origin https://github.com/OWNER/gemini-chat.git `
     - Example using SSH: ` git remote add origin git@github.com:OWNER/gemini-chat.git `
+  - Create and switch to main branch: ` git checkout -b main `
   - Stage all files: ` git add -A `
   - Add a commit message: ` git commit -m "Init commit" `
   - Push changes to GitHub: ` git push origin main `
-- 
