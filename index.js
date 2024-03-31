@@ -3,10 +3,10 @@
 
 require('dotenv').config()
 const fs = require("fs")
+const path = require("path")
 const archiver = require("archiver")
 const readline = require("readline")
 const { GoogleGenerativeAI } = require("@google/generative-ai")
-const directory = __dirname
 
 // Set GenerativeMode name: gemini-pro|gemini-pro-vision
 const apiModel = "gemini-pro"
@@ -141,50 +141,114 @@ if (arg1.includes("-l")) {
  * Creates gemini-chat.zip in current directory
  * Command: npm run zip
  */
-const zip = async () => {
-  const file = `${directory}/gemini-chat.zip`
+const zip = () => {
+  const zipFile = path.resolve(__dirname,'gemini-chat.zip')
+  const indexFile = path.resolve(__dirname,'index.js')
+  const indexStream = fs.createReadStream(indexFile)
+  const packageFile = path.resolve(__dirname,'package.json')
+  const packageStream = fs.createReadStream(packageFile)
+  const packageLockFile = path.resolve(__dirname,'package-lock.json')
+  const packageLockStream = fs.createReadStream(packageLockFile)
+  const licenseFile = path.resolve(__dirname,'LICENSE')
+  const licenseStream = fs.createReadStream(licenseFile)
+
+  // Verify index.js exists.
+  indexStream.on('error', function(error) {
+    if (error.code === "ENOENT") {
+      console.log(`\nUnable to resolve: ${indexFile}.\n`)
+      process.exit(0)
+    } else {
+      throw error
+    }
+  })
+
+  // Verify package.json exists.
+  packageStream.on('error', function(error) {
+    if (error.code === "ENOENT") {
+      console.log(`\nUnable to resolve: ${packageFile}.\n`)
+      process.exit(0)
+    } else {
+      throw error
+    }
+  })
+
+  // Verify package-lock.json exists.
+  packageLockStream.on('error', function(error) {
+    if (error.code === "ENOENT") {
+      console.log(`\nUnable to resolve: ${packageLockFile}.\n`)
+      process.exit(0)
+    } else {
+      throw error
+    }
+  })
+
+  // Verify LICENSE exists.
+  licenseStream.on('error', function(error) {
+    if (error.code === "ENOENT") {
+      console.log(`\nUnable to resolve: ${licenseFile}.\n`)
+      process.exit(0)
+    } else {
+      throw error
+    }
+  })
 
   // Create a file to stream archive data to.
-  const output = fs.createWriteStream(file)
+  const output = fs.createWriteStream(zipFile)
   const archive = archiver("zip", {
     zlib: { level: 9 },
   })
 
+  /**
   // This event is fired when the data source is drained no matter what was the data source.
   // It is not part of this library but rather from the NodeJS Stream API.
   // @see: https://nodejs.org/api/stream.html#stream_event_end
+  */
   output.on("end", function () {
-    console.log("Data has been drained")
+    console.log('\nNode stream error: Data has been drained.\n')
+    process.exit(0)
   })
+
+  // Pipe archive data to the file.
+  archive.pipe(output)
+
+  // Append files from a sub-directory, putting its contents at the root of archive.
+  archive.append(indexStream, { name: 'index.js' })
+  archive.append(packageStream, { name: 'package.json' })
+  archive.append(packageLockStream, { name: 'package-lock.json' })
+  archive.append(licenseStream, { name: 'LICENSE' })
 
   // Stat failures and other non-blocking errors.
   archive.on("warning", function (error) {
     if (error.code === "ENOENT") {
-      // log warning
+      console.log('\nArchiver error: No such directory entry.\n')
+      process.exit(0)
     } else {
-      // throw error
       throw error
     }
   })
 
   // Catch error explicitly.
   archive.on("error", function (error) {
-    throw error
+    console.error('\nArchiver error: \n', error)
+    process.exit(0)
   })
 
-  // Append files from a sub-directory, putting its contents at the root of archive.
-  archive.file('index.js', { name: 'index.js' })
-  archive.file('package.json', { name: 'package.json' })
+  output.on('finish', () => {
+    console.log('\nZip file created')
+    console.log(`File: ${zipFile}`)
+  })
 
-  // Pipe archive data to the file.
-  archive.pipe(output)
+  // Listen for all archive data to be written.
+  // Event 'close' is fired only when a file descriptor is involved.
+  output.on('close', function() {
+    const bytes = archive.pointer();
+    const mb = (bytes/1014)
+    console.log(`Size: ${Math.round(mb * 100) / 100}mb\n`)
+  })
 
-  console.log(`Zip file created: ${file}\n`)
-
-  // Finalize the archive (ie we are done appending files but streams have to finish yet)
+  // Finalize the archive (ie we are done appending files but streams have to finish yet),
   // 'close', 'end' or 'finish' may be fired right after calling this method so register to them beforehand.
   archive.finalize()
-  process.exit(0)
 }
 
 if (arg1.includes("-z")) {
