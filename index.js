@@ -2,8 +2,11 @@
 'use strict'
 
 require('dotenv').config()
+const fs = require("fs")
+const archiver = require("archiver")
 const readline = require("readline")
 const { GoogleGenerativeAI } = require("@google/generative-ai")
+const directory = __dirname
 
 // Set GenerativeMode name: gemini-pro|gemini-pro-vision
 const apiModel = "gemini-pro"
@@ -36,15 +39,17 @@ const model = geminiAI.getGenerativeModel({ model: apiModel})
 const [arg1] = process.argv.slice(2)
 
 // Argument required.
-if (!arg1 || (!arg1.includes("-t") && !arg1.includes("-l"))) {
+if (!arg1 || (!arg1.includes("-t") && !arg1.includes("-l") && !arg1.includes("-z"))) {
   console.log(`\nArgument missing: npm run chat [-arg]`)
   console.log(`npm run chat -t [-test --test] | Run single response test prompt.`)
   console.log(`npm run chat -l [-live --live] | Run live chat model.\n`)
+  console.log(`npm run chat -z [-zip --zip]   | Zip the project.\n`)
   process.exit(0)
 }
 
 /**
  * Test single call to the model.
+ * Command: npm run test
  * @param {string} prompt Test prompt for single call model.
  */
 const test = async (prompt) => {
@@ -73,6 +78,7 @@ if (arg1.includes("-t")) {
 
 /**
  * Hook chat session and prompt loop.
+ * Command: npm run chat
  */
 const chat = async () => {
   // Start new ChatSession instance used for multi-turn chats.
@@ -128,4 +134,59 @@ const chat = async () => {
 
 if (arg1.includes("-l")) {
   chat()
+}
+
+/**
+ * Create project zip file
+ * Creates gemini-chat.zip in current directory
+ * Command: npm run zip
+ */
+const zip = async () => {
+  const file = `${directory}/gemini-chat.zip`
+
+  // Create a file to stream archive data to.
+  const output = fs.createWriteStream(file)
+  const archive = archiver("zip", {
+    zlib: { level: 9 },
+  })
+
+  // This event is fired when the data source is drained no matter what was the data source.
+  // It is not part of this library but rather from the NodeJS Stream API.
+  // @see: https://nodejs.org/api/stream.html#stream_event_end
+  output.on("end", function () {
+    console.log("Data has been drained")
+  })
+
+  // Stat failures and other non-blocking errors.
+  archive.on("warning", function (error) {
+    if (error.code === "ENOENT") {
+      // log warning
+    } else {
+      // throw error
+      throw error
+    }
+  })
+
+  // Catch error explicitly.
+  archive.on("error", function (error) {
+    throw error
+  })
+
+  // Append files from a sub-directory, putting its contents at the root of archive.
+  archive.file('index.js', { name: 'index.js' })
+  archive.file('package.json', { name: 'package.json' })
+
+  // Pipe archive data to the file.
+  archive.pipe(output)
+
+  console.log(`Zip file created: ${file}\n`)
+
+  // Finalize the archive (ie we are done appending files but streams have to finish yet)
+  // 'close', 'end' or 'finish' may be fired right after calling this method so register to them beforehand.
+  archive.finalize()
+  process.exit(0)
+}
+
+if (arg1.includes("-z")) {
+  zip()
 }
