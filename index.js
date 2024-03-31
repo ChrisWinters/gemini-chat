@@ -5,20 +5,15 @@ require('dotenv').config()
 const fs = require("fs")
 const path = require("path")
 const archiver = require("archiver")
+const inquirer = require("inquirer")
 const readline = require("readline")
 const { GoogleGenerativeAI } = require("@google/generative-ai")
 
 // Maximum tokens to use for API replies.
-const maxChatTokens = 500
+const tokens = 500
 
 // Test prompt for single call model.
 const prompt = "Select any unique word related to Google and create a fun initialism, then explain it."
-
-// API Key Required.
-if (!process.env.API_KEY) {
-  console.log(`\nNo action taken: Missing Google Generative AI API Key\n`)
-  process.exit(0)
-}
 
 // Initialize Google Generative AI and pass in API key.
 const geminiAI = new GoogleGenerativeAI(process.env.API_KEY)
@@ -31,11 +26,45 @@ const [arg1] = process.argv.slice(2)
 
 // Argument required.
 if (!arg1 || (!arg1.includes("-t") && !arg1.includes("-l") && !arg1.includes("-z"))) {
-  console.log(`\nArgument missing: npm run chat [-arg]`)
-  console.log(`npm run chat -t [-test --test] | Run single response test prompt.`)
-  console.log(`npm run chat -l [-live --live] | Run live chat model.\n`)
-  console.log(`npm run chat -z [-zip --zip]   | Zip the project.\n`)
+  console.log(`\nArgument missing: npm run [command]`)
+  console.log(`npm run test | Run single response test prompt.`)
+  console.log(`npm run chat | Run live chat model.`)
+  console.log(`npm run zip  | Zip the project.\n`)
   process.exit(0)
+}
+
+/**
+ * API Key missing: Inquirer about API Key and maybe create .env file.
+ */
+const apiKey = async () => {
+  console.log("\nEnter a Google Generative AI API Key then press enter.")
+  console.log("Create API Key: https://aistudio.google.com/app/apikey\n")
+
+  // Launch the prompt interface.
+  const answer = await inquirer.prompt({
+    type: "input",
+    name: "api_key",
+    message: "\nAPI Key >"
+  })
+
+  // If API Key was provided.
+  if (answer['api_key'].length) {
+    const apiKey = answer['api_key'].toString()
+
+    // Asynchronously writes data to a file, replacing the file if it already exists.
+    fs.writeFile('.env', `API_KEY=${apiKey}\nTOKENS=${tokens}`, (error) => {
+      if (error) {
+        console.log("\nNo action taken: Unable to create .env file.\n")
+      } else {
+        const command = process.env.npm_lifecycle_event
+        console.log("\nCreated .env and saved API Key data.")
+        console.log(`Run the command again: npm run ${command}\n`)
+      }
+    })
+  // No API Key provided.
+  } else {
+    console.log("\nNo action taken: A Google Generative AI API Key is required!\n")
+  }
 }
 
 /**
@@ -63,20 +92,18 @@ const test = async (prompt) => {
   }
 }
 
-if (arg1.includes("-t")) {
-  test(prompt)
-}
-
 /**
  * Hook chat session and prompt loop.
  * Command: npm run chat
  */
 const chat = async () => {
+  const maxTokens = (process.env.TOKENS) ? process.env.TOKENS : tokens
+
   // Start new ChatSession instance used for multi-turn chats.
   const chatSession = model.startChat({
     history: [],
     generationConfig: {
-      maxOutputTokens: maxChatTokens,
+      maxOutputTokens: maxTokens,
     }
   })
 
@@ -127,10 +154,6 @@ const chat = async () => {
   }
 
   askAndRespond(false)
-}
-
-if (arg1.includes("-l")) {
-  chat()
 }
 
 /**
@@ -230,6 +253,7 @@ const zip = () => {
     process.exit(0)
   })
 
+  // Finished receiving and writing data.
   output.on('finish', () => {
     console.log('\nZip file created')
     console.log(`File: ${zipFile}`)
@@ -238,7 +262,7 @@ const zip = () => {
   // Listen for all archive data to be written.
   // Event 'close' is fired only when a file descriptor is involved.
   output.on('close', function() {
-    const bytes = archive.pointer();
+    const bytes = archive.pointer()
     const mb = (bytes/1014)
     console.log(`Size: ${Math.round(mb * 100) / 100}mb\n`)
   })
@@ -248,6 +272,27 @@ const zip = () => {
   archive.finalize()
 }
 
-if (arg1.includes("-z")) {
-  zip()
+/**
+ * Init Gemini AI.
+ */
+const init = () => {
+  // API Key Required.
+  if (!process.env.API_KEY) {
+    apiKey()
+    return
+  }
+
+  if (arg1.includes("-t")) {
+    test(prompt)
+  }
+
+  if (arg1.includes("-l")) {
+    chat()
+  }
+
+  if (arg1.includes("-z")) {
+    zip()
+  }
 }
+
+init()
