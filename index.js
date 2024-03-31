@@ -8,9 +8,6 @@ const archiver = require("archiver")
 const readline = require("readline")
 const { GoogleGenerativeAI } = require("@google/generative-ai")
 
-// Set GenerativeMode name: gemini-pro|gemini-pro-vision
-const apiModel = "gemini-pro"
-
 // Maximum tokens to use for API replies.
 const maxChatTokens = 500
 
@@ -27,7 +24,7 @@ if (!process.env.API_KEY) {
 const geminiAI = new GoogleGenerativeAI(process.env.API_KEY)
 
 // Create GenerativeModel instance for the provided model name.
-const model = geminiAI.getGenerativeModel({ model: apiModel})
+const model = geminiAI.getGenerativeModel({ model: "gemini-pro"})
 
 // Get command-line argument.
 const [arg1] = process.argv.slice(2)
