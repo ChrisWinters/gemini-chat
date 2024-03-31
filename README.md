@@ -64,4 +64,7 @@ Command              | Script                       | Description
 Use at your own risk. The Gemini Chat script comes with ABSOLUTELY NO WARRANTY, NO GUARANTEES, NO MERCHANTABILITY, AND NO FITNESS FOR A PARTICULAR PURPOSE.
 
 - [Gemini Apps Privacy Notice](https://support.google.com/gemini/answer/13594961?hl=en)
-- Gemini Chat script is distributed under [Apache 2.0 License](https://github.com/ChrisWinters/gemini-chat/blob/main/LICENSE)
+
+## License
+
+Gemini Chat script is distributed under [Apache 2.0 License](https://github.com/ChrisWinters/gemini-chat/blob/main/LICENSE)
