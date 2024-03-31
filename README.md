@@ -1,40 +1,46 @@
 # Personal Gemini Chatbot
 
-## Requirements
+Interact with Google's Gemini AI.
 
-- Git and a GitHub account
+## Based on
+
+- [Get started with the Gemini API in Node.js applications](https://ai.google.dev/tutorials/get_started_node)
+- [Master the Gemini API: A Node.js tutorial with real examples](https://www.youtube.com/watch?v=Z8F6FvMrN4o)
+
+## Setup
+
+Locally setup Personal Gemini Chatbot to get started.
+
+### Requirements
+
+- [API Key](https://aistudio.google.com/app/apikey) from Google AI Studio
+- [Node.js](https://nodejs.org/en/download) version 20 and above
+- [Git](https://git-scm.com/downloads) * Optional but recommended
   - Check Git version: ` git --version `
-- Node version 20 or above
-  - Check Node version: ` node --version `
-- An editor, such as VS Code
-  - Check VS Code version: ` code --version `
 
-## Creation steps
+### Install
 
-- Open VS Code to Project directory
-- Open the Terminal
-- Create and move into ` /gemini-chat/ ` directory ` mkdir gemini-chat ` then ` cd gemini-chat `
-- Initialize project ` npm init `, answer questions, update info as needed
-- Install packages
-  - ` npm install @google/generative-ai `
-  - ` npm install dotenv `
-  - ` npm install readline `
-- Create gitignore: ` code .gitignore `, add ` node_modules ` as first line and save
-- Right click Explorer sidebar area, and select ` Generate .editorconfig ` and save
-  - Optionally change indent_size = 4 to indent_size = 2 and save
-- Create readme: ` code README.md `, update to current point, and save
-- Initialize Git repo: ` git init `
-  - Create a repository at GitHub
-    - Repositories tab
-    - New button
-    - Repository name: ` gemini-chat `
-    - Description: ` A Personal Gemini Chatbot `
-    - Select: ` Private `
-    - Click the ` Create repository ` button
-  - Add repository url to local project
-    - Example using HTTPS: ` git remote add origin https://github.com/OWNER/gemini-chat.git `
-    - Example using SSH: ` git remote add origin git@github.com:OWNER/gemini-chat.git `
-  - Create and switch to main branch: ` git checkout -b main `
-  - Stage all files: ` git add -A `
-  - Add a commit message: ` git commit -m "Init commit" `
-  - Push changes to GitHub: ` git push origin main `
+1. Open a terminal
+   - **Windows**: Right-click the Start button and select: ` Windows PowerShell `
+   - **Mac**: Command + Space to open Spotlight search, type in ` Terminal ` and select
+   - **Linux**: Press CTRL + ALT + T simultaneously
+2. In the terminal change locations to store this project, such as ` cd ~/Documents `
+   - Optionally create a Projects directory instead of using the Documents directory
+     - Make the Projects directory: ` mkdir ~/Projects `
+     - Change directories into Projects: ` cd ~/Projects `
+3. 2 methods to setup the project
+   - Method 1: Clone the project into the current directory
+     - Via HTTPS: ` git clone https://github.com/ChrisWinters/gemini-chat.git `
+     - Via SSH: ` git clone git@github.com:ChrisWinters/gemini-chat.git `
+     - Via CLI: ` gh repo clone ChrisWinters/gemini-chat `
+   - Method 2: Use curl to quickly download the project zip file into the current directory
+     - **Windows** terminal: ` curl `, copy/paste the pre-packaged zip file url ` https://github.com/ChrisWinters/gemini-chat/raw/master/gemini-chat.zip `
+     - **Mac/Linux** terminal: ` curl -L -O https://github.com/ChrisWinters/gemini-chat/raw/master/gemini-chat.zip `
+     - Unzip the gemini-chat.zip file
+       - **Windows**: ` tar -xf gemini-chat.zip `
+       - **Mac**: ` tar -xvf gemini-chat.zip `
+       - **Linux**: ` tar -xzf gemini-chat.zip `
+     - Delete the zip file: ` rm gemini-chat.zip `
+4. Change directories into the Gemini chat directory: ` cd gemini-chat `
+5. Install build packages: ` npm install `
+6. Run project: ` npm run chat `
