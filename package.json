@@ -10,7 +10,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node index.js -t",
-    "live": "node index.js -l"
+    "chat": "node index.js -l"
   },
   "dependencies": {
     "@google/generative-ai": "^0.3.1",
