@@ -23,12 +23,6 @@ if (!process.env.API_KEY) {
   process.exit(0)
 }
 
-// Creates a new readline interface instance.
-const read = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-})
-
 // Initialize Google Generative AI and pass in API key.
 const geminiAI = new GoogleGenerativeAI(process.env.API_KEY)
 
@@ -96,6 +90,12 @@ const chat = async () => {
     if (!status) {
       console.log("\n\n ==> Type 'exit' to quit.\n")
     }
+
+    // Creates a new readline interface instance.
+    const read = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    })
 
     read.question("Enter a prompt > ", async (msg) => {
       // Type exit to quit.
