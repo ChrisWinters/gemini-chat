@@ -43,4 +43,5 @@ Locally setup Personal Gemini Chatbot to get started.
      - Delete the zip file: ` rm gemini-chat.zip `
 4. Change directories into the Gemini chat directory: ` cd gemini-chat `
 5. Install build packages: ` npm install `
-6. Run project: ` npm run chat `
+6. Run test prompt: ` npm run test `
+7. Run chat prompt: ` npm run chat `
