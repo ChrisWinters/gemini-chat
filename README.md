@@ -4,8 +4,8 @@ Use the terminal to interact with Google's Gemini AI.
 
 ## Based on
 
-- [Get started with the Gemini API in Node.js applications](https://ai.google.dev/tutorials/get_started_node){:target="_blank"}
-- [Master the Gemini API: A Node.js tutorial with real examples](https://www.youtube.com/watch?v=Z8F6FvMrN4o){:target="_blank"}
+- [Get started with the Gemini API in Node.js applications](https://ai.google.dev/tutorials/get_started_node)
+- [Master the Gemini API: A Node.js tutorial with real examples](https://www.youtube.com/watch?v=Z8F6FvMrN4o)
 
 ## Setup
 
@@ -13,17 +13,17 @@ Locally setup the Personal Gemini Chatbot project to get started.
 
 ### Requirements
 
-- [API Key](https://aistudio.google.com/app/apikey){:target="_blank"} from Google AI Studio
-- [Node.js](https://nodejs.org/en/download){:target="_blank"} version 20 and above
+- [API Key](https://aistudio.google.com/app/apikey) from Google AI Studio
+- [Node.js](https://nodejs.org/en/download) version 20 and above
   - Check Node.js version: ` node --version `
-- [Git](https://git-scm.com/downloads){:target="_blank"} * Optional but recommended
+- [Git](https://git-scm.com/downloads) * Optional but recommended
   - Check Git version: ` git --version `
 
 ### Install project
 
 > **Do not share confidential or personal information with Gemini AI.**
 
-1. Get an [API Key](https://aistudio.google.com/app/apikey){:target="_blank"} from Google AI Studio
+1. Get an [API Key](https://aistudio.google.com/app/apikey) from Google AI Studio
 2. Open a terminal
    - **Windows**: Right-click the Start button and select: ` Windows PowerShell `
    - **Mac**: Command + Space to open Spotlight search, type in ` Terminal ` and select
