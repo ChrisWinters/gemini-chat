@@ -21,6 +21,8 @@ Locally setup the Personal Gemini Chatbot project to get started.
 
 ### Install project
 
+> **Do not share confidential or personal information with Gemini AI.**
+
 1. Get an [API Key](https://aistudio.google.com/app/apikey){:target="_blank"} from Google AI Studio
 2. Open a terminal
    - **Windows**: Right-click the Start button and select: ` Windows PowerShell `
@@ -37,7 +39,7 @@ Locally setup the Personal Gemini Chatbot project to get started.
      - Via **CLI**: ` gh repo clone ChrisWinters/gemini-chat `
    - **Method 2 (without Git)**: Use curl to quickly download the pre-packaged zip file into the current directory
      - **Windows** terminal type: ` curl `, press enter, then copy/paste the following Uri: ` https://github.com/ChrisWinters/gemini-chat/raw/main/gemini-chat.zip `
-     - **Mac/Linux** terminal: ` curl -L -O https://github.com/ChrisWinters/gemini-chat/raw/main/gemini-chat.zip `
+     - **Mac/Linux** terminal: ` curl -c -O https://github.com/ChrisWinters/gemini-chat/raw/main/gemini-chat.zip `
      - Unzip the gemini-chat.zip file
        - **Windows** terminal: ` tar -xf gemini-chat.zip `
        - **Mac** terminal: ` tar -xvf gemini-chat.zip `
@@ -48,15 +50,13 @@ Locally setup the Personal Gemini Chatbot project to get started.
 7. Run test prompt: ` npm run test ` (API Key required)
 8. Run chat prompt: ` npm run chat ` (API Key required)
 
-*NOTICE*: Do not share confidential or personal information with Gemini AI.
-
 ## Build commands
 
 Command              | Script                       | Description
 ---                  | ---                          | ---
 ``` npm install ```  |                              | Install dependencies
 ``` npm run test ``` | ``` node index.js --test ``` | Runs test prompt
-``` npm run chat ``` | ``` node index.js --live ``` | Runs interactive chat prompt
+``` npm run chat ``` | ``` node index.js --chat ``` | Runs interactive chat prompt
 ``` npm run zip ```  | ``` node index.js --zip ```  | Creates gemini-chat.zip
 
 ## Disclaimer
