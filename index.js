@@ -180,6 +180,7 @@ const img = async () => {
     const files = fs.readdirSync('./images')
     let imgPrompt = ''
     let imgFiles = []
+    let imgParts = []
     let i = 0
 
     // Loop through the files and print the name of each file
@@ -191,7 +192,7 @@ const img = async () => {
     })
 
     // Launch the prompt interface.
-    const imgParts = await inquirer.prompt([{
+    const answers = await inquirer.prompt([{
       type: "checkbox",
       name: "images",
       choices: imgFiles,
@@ -211,7 +212,12 @@ const img = async () => {
     })
 
     // Get GenerateContentResponse object.
-    if (imgParts['prompt'].length && imgParts['images'].length) {
+    if (answers['prompt'].length && answers['images'].length) {
+      // Loop through the files and print the name of each file
+      answers['images'].forEach(file => {
+        imgParts = [filePart(`./images/${file}`, mime.lookup(`./images/${file}`))]
+      })
+
       // Single non-streaming call to the model, returns object containing a single GenerateContentResponse.
       const result = await model.generateContent([imgPrompt, ...imgParts])
   
