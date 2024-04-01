@@ -6,11 +6,30 @@ const fs = require("fs")
 const path = require("path")
 const archiver = require("archiver")
 const inquirer = require("inquirer")
+const mime = require('mime-types')
 const readline = require("readline")
 const { GoogleGenerativeAI } = require("@google/generative-ai")
+let generativeModel = "gemini-pro"
+
+// Get command-cine argument.
+const [arg1] = process.argv.slice(2)
+
+// Argument required.
+if (!arg1 || (!arg1.includes("-t") && !arg1.includes("-c") && !arg1.includes("-i") && !arg1.includes("-z"))) {
+  console.log(`\nArgument missing: npm run [command]`)
+  console.log(`npm run test | Run single response test prompt.`)
+  console.log(`npm run chat | Run interactive chat model.`)
+  console.log(`npm run img  | Run interactive chat model.`)
+  console.log(`npm run zip  | Zip the project.\n`)
+  process.exit(0)
+}
+
+if (arg1.includes("-i")) {
+  generativeModel = "gemini-pro-vision"
+}
 
 // Maximum tokens to use for API replies.
-const tokens = 500
+const maxTokens = (process.env.TOKENS) ? process.env.TOKENS : 500
 
 // Test prompt for single call model.
 const prompt = "Select any unique word related to Google and create a fun initialism, then explain it."
@@ -19,19 +38,7 @@ const prompt = "Select any unique word related to Google and create a fun initia
 const geminiAI = new GoogleGenerativeAI(process.env.API_KEY)
 
 // Create GenerativeModel instance for the provided model name.
-const model = geminiAI.getGenerativeModel({ model: "gemini-pro"})
-
-// Get command-line argument.
-const [arg1] = process.argv.slice(2)
-
-// Argument required.
-if (!arg1 || (!arg1.includes("-t") && !arg1.includes("-l") && !arg1.includes("-z"))) {
-  console.log(`\nArgument missing: npm run [command]`)
-  console.log(`npm run test | Run single response test prompt.`)
-  console.log(`npm run chat | Run live chat model.`)
-  console.log(`npm run zip  | Zip the project.\n`)
-  process.exit(0)
-}
+const model = geminiAI.getGenerativeModel({ model: generativeModel})
 
 /**
  * API Key missing: Inquirer about API Key and maybe create .env file.
@@ -44,7 +51,7 @@ const apiKey = async () => {
   const answer = await inquirer.prompt({
     type: "input",
     name: "api_key",
-    message: "\nAPI Key >"
+    message: "API Key >"
   })
 
   // If API Key was provided.
@@ -52,7 +59,7 @@ const apiKey = async () => {
     const apiKey = answer['api_key'].toString()
 
     // Asynchronously writes data to a file, replacing the file if it already exists.
-    fs.writeFile('.env', `API_KEY=${apiKey}\nTOKENS=${tokens}`, (error) => {
+    fs.writeFile('.env', `API_KEY=${apiKey}\nTOKENS=${maxTokens}`, (error) => {
       if (error) {
         console.log("\nNo action taken: Unable to create .env file.\n")
       } else {
@@ -93,12 +100,10 @@ const test = async (prompt) => {
 }
 
 /**
- * Hook chat session and prompt loop.
+ * Interactive chat session and prompt loop.
  * Command: npm run chat
  */
 const chat = async () => {
-  const maxTokens = (process.env.TOKENS) ? process.env.TOKENS : tokens
-
   // Start new ChatSession instance used for multi-turn chats.
   const chatSession = model.startChat({
     history: [],
@@ -157,6 +162,79 @@ const chat = async () => {
 }
 
 /**
+ * Image prompt session.
+ * Command: npm run img
+ */
+const img = async () => {
+  const filePart = (path, mimeType) => {
+    return {
+      inlineData: {
+        data: Buffer.from(fs.readFileSync(path)).toString("base64"),
+        mimeType,
+      }
+    }
+  }
+
+  try {
+    // Read the contents of the images directory
+    const files = fs.readdirSync('./images')
+    let imgPrompt = ''
+    let imgFiles = []
+    let i = 0
+
+    // Loop through the files and print the name of each file
+    files.forEach(file => {
+      if (file.includes(".jpg") || file.includes(".jpeg") || file.includes(".gif") || file.includes(".png")) {
+        imgFiles[i] = file
+        ++i
+      }
+    })
+
+    // Launch the prompt interface.
+    const imgParts = await inquirer.prompt([{
+      type: "checkbox",
+      name: "images",
+      choices: imgFiles,
+      message: "Select image(s) >"
+    },{
+      type: "input",
+      name: "prompt",
+      message: "Image Prompt >",
+      default: "Can you tell me what this is an image of?"
+    }])
+    .catch((error) => {
+      if (error.isTtyError) {
+        console.log("\nInquirer prompt could not be rendered in the current environment.\n")
+      } else {
+        console.log("\nUnknown error: Something went wrong.\n")
+      }
+    })
+
+    // Get GenerateContentResponse object.
+    if (imgParts['prompt'].length && imgParts['images'].length) {
+      // Single non-streaming call to the model, returns object containing a single GenerateContentResponse.
+      const result = await model.generateContent([imgPrompt, ...imgParts])
+  
+      // Maybe get response text and return to console log.
+      if (result.response) {
+        const reply = result.response.text()
+    
+        // Display prompt and reply.
+        console.log(`\nPrompt: ${prompt}`)
+        console.log(`Response: ${reply}\n`)
+        process.exit(0)
+      }
+    } else {
+      console.log("\nNo action taken: Image selection and image prompt required.\n")
+      process.exit(0)
+    }
+  } catch (error) {
+    console.error("Error:", error)
+    process.exit(0)
+  }
+}
+
+/**
  * Create project zip file
  * Creates gemini-chat.zip in current directory
  * Command: npm run zip
@@ -167,7 +245,7 @@ const zip = () => {
   const indexStream = fs.createReadStream(indexFile)
   const packageFile = path.resolve(__dirname,'package.json')
   const packageStream = fs.createReadStream(packageFile)
-  const packageLockFile = path.resolve(__dirname,'package-lock.json')
+  const packageLockFile = path.resolve(__dirname,'package-cock.json')
   const packageLockStream = fs.createReadStream(packageLockFile)
   const licenseFile = path.resolve(__dirname,'LICENSE')
   const licenseStream = fs.createReadStream(licenseFile)
@@ -192,7 +270,7 @@ const zip = () => {
     }
   })
 
-  // Verify package-lock.json exists.
+  // Verify package-cock.json exists.
   packageLockStream.on('error', function(error) {
     if (error.code === "ENOENT") {
       console.log(`\nUnable to resolve: ${packageLockFile}.\n`)
@@ -234,7 +312,7 @@ const zip = () => {
   // Append files from a sub-directory, putting its contents at the root of archive.
   archive.append(indexStream, { name: 'index.js' })
   archive.append(packageStream, { name: 'package.json' })
-  archive.append(packageLockStream, { name: 'package-lock.json' })
+  archive.append(packageLockStream, { name: 'package-cock.json' })
   archive.append(licenseStream, { name: 'LICENSE' })
 
   // Stat failures and other non-blocking errors.
@@ -286,8 +364,12 @@ const init = () => {
     test(prompt)
   }
 
-  if (arg1.includes("-l")) {
+  if (arg1.includes("-c")) {
     chat()
+  }
+
+  if (arg1.includes("-i")) {
+    img()
   }
 
   if (arg1.includes("-z")) {
