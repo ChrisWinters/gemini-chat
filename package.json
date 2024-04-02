@@ -10,7 +10,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node index.js -t",
-    "chat": "node index.js -l",
+    "chat": "node index.js -c",
     "img": "node index.js -i",
     "zip": "node index.js -z"
   },
