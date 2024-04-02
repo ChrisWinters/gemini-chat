@@ -1,17 +1,29 @@
-# Personal Gemini Chatbot
+# Personal Gemini AI Chat
 
 Use the terminal to interact with Google's Gemini AI.
 
-## Based on
+## Features
 
-- [Get started with the Gemini API in Node.js applications](https://ai.google.dev/tutorials/get_started_node)
-- [Master the Gemini API: A Node.js tutorial with real examples](https://www.youtube.com/watch?v=Z8F6FvMrN4o)
+- Test command ` npm run test ` - Gemini will tell you a joke and explain it
+  - The joke is never funny, while the explanations are
+- Chat command ` npm run chat ` - Activates the interactive chat prompt
+  - Use cases: Ask a question, code review/help, write an article, research
+  - Type 'exit' to quit, or press CTRL/CMD+C
+- Image command ` npm run img ` - Activates the image query and text prompt
+  - Use cases: Captioning an image, identifying what an image is, or what's in an image
+  - Add images (jpg, png, gif) to the /images/ directory, then select image(s) when prompted
 
-## Setup
+### First time use
 
-Locally setup the Personal Gemini Chatbot project to get started.
+When any command above is first used a prompt with ask you for your Google AI Studio API key.
 
-### Requirements
+To skip this step manually create a ` .env ` file, then add the API KEY variable with your Google AI Studio API Key.
+
+```js
+API_KEY=your-api-key
+```
+
+## Requirements
 
 - [API Key](https://aistudio.google.com/app/apikey) from Google AI Studio
 - [Node.js](https://nodejs.org/en/download) version 20 and above
@@ -19,7 +31,7 @@ Locally setup the Personal Gemini Chatbot project to get started.
 - [Git](https://git-scm.com/downloads) * Optional but recommended
   - Check Git version: ` git --version `
 
-### Install project
+## Install and setup project
 
 > **Do not share confidential or personal information with Gemini AI.**
 
@@ -47,17 +59,23 @@ Locally setup the Personal Gemini Chatbot project to get started.
      - Delete the zip file: ` rm gemini-chat.zip `
 5. Change directories into the Gemini chat directory: ` cd gemini-chat `
 6. Install build packages: ` npm install `
-7. Run test prompt: ` npm run test ` (API Key required)
-8. Run chat prompt: ` npm run chat ` (API Key required)
+7. Run any of the commands
 
-## Build commands
+Personal Gemini Chat is now ready to use.
+
+## Commands
 
 Command              | Script                       | Description
 ---                  | ---                          | ---
 ``` npm install ```  |                              | Install dependencies
 ``` npm run test ``` | ``` node index.js --test ``` | Runs test prompt
 ``` npm run chat ``` | ``` node index.js --chat ``` | Runs interactive chat prompt
-``` npm run zip ```  | ``` node index.js --zip ```  | Creates gemini-chat.zip
+``` npm run img ```  | ``` node index.js --img ```  | Runs image query prompt
+
+## Credits
+
+- [Get started with the Gemini API in Node.js applications](https://ai.google.dev/tutorials/get_started_node)
+- [Master the Gemini API: A Node.js tutorial with real examples](https://www.youtube.com/watch?v=Z8F6FvMrN4o)
 
 ## Disclaimer
 
