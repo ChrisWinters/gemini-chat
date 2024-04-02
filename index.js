@@ -128,6 +128,12 @@ const chat = async () => {
     }
   })
 
+  // Creates a new readline interface instance.
+  const read = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+
   /**
    * Ask / response question callback loop.
    */
@@ -135,12 +141,6 @@ const chat = async () => {
     if (!status) {
       console.log("\n\n ==> Type 'exit' to quit.\n")
     }
-
-    // Creates a new readline interface instance.
-    const read = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    })
 
     read.question("Enter a prompt > ", async (msg) => {
       // Type exit to quit.
@@ -150,9 +150,19 @@ const chat = async () => {
       }
 
       try {
-        // Sends a chat message and receives a non-streaming GenerateContentResult.
-        const generateResult = await chatSession.sendMessage(msg)
+        // Send chat message/receive response as GenerateContentStreamResult containing an iterable stream and a response promise.
+        const generateResult = await chatSession.sendMessageStream(msg)
+        let text = ""
 
+        for await (const chunk of generateResult.stream) {
+          const response = chunk.text()
+          console.log(`\nAI > ${response}\n`)
+          text += response
+        }
+
+        // Hook callback to repeat.
+        askAndRespond(true)
+/**
         // API returned safety error.
         if (generateResult.response.candidates[0].finishReason === "SAFETY") {
           console.log(`\n ==> Gemini returned a safety warning, reword the prompt and try again.\n`)
@@ -163,10 +173,8 @@ const chat = async () => {
         if (generateResult.response.candidates[0].finishReason === "STOP") {
           const response = generateResult.response.text()
           console.log(`\nAI > ${response}\n`)
-
-          // Hook callback to repeat.
-          askAndRespond(true)
         }
+ */
       } catch (error) {
         console.error("Error:", error)
         process.exit(0)
