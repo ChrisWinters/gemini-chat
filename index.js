@@ -41,14 +41,30 @@ const geminiAI = new GoogleGenerativeAI(process.env.API_KEY)
 const model = geminiAI.getGenerativeModel({ model: generativeModel})
 
 /**
+ * Run Questions and Answers prompt.
+ * Launch the inquire prompt interface.
+ * @param {array} questions Array containing Question Object.
+ * @returns array
+ */
+const inquirerPrompt = async (questions) => {
+  return await inquirer.prompt(questions)
+    .catch((error) => {
+      if (error.isTtyError) {
+        console.log("\nInquirer prompt could not be rendered in the current environment.\n")
+      } else {
+        console.log("\nInquirer error: Something went wrong.\n")
+      }
+    })
+}
+
+/**
  * API Key missing: Inquirer about API Key and maybe create .env file.
  */
 const apiKey = async () => {
   console.log("\nEnter a Google Generative AI API Key then press enter.")
   console.log("Create API Key: https://aistudio.google.com/app/apikey\n")
 
-  // Launch the prompt interface.
-  const answer = await inquirer.prompt({
+  const answer = inquirerPrompt({
     type: "input",
     name: "api_key",
     message: "API Key >"
@@ -191,8 +207,7 @@ const img = async () => {
       }
     })
 
-    // Launch the prompt interface.
-    const answers = await inquirer.prompt([{
+    const answer = inquirerPrompt([{
       type: "checkbox",
       name: "images",
       choices: imgFiles,
@@ -203,18 +218,11 @@ const img = async () => {
       message: "Image Prompt >",
       default: "Can you tell me what this is an image of?"
     }])
-    .catch((error) => {
-      if (error.isTtyError) {
-        console.log("\nInquirer prompt could not be rendered in the current environment.\n")
-      } else {
-        console.log("\nUnknown error: Something went wrong.\n")
-      }
-    })
 
     // Get GenerateContentResponse object.
-    if (answers['prompt'].length && answers['images'].length) {
+    if (answer['prompt'].length && answer['images'].length) {
       // Loop through the files and print the name of each file
-      answers['images'].forEach(file => {
+      answer['images'].forEach(file => {
         imgParts = [filePart(`./images/${file}`, mime.lookup(`./images/${file}`))]
       })
 
