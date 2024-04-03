@@ -32,7 +32,7 @@ if (arg1.includes("-i")) {
 const maxTokens = (process.env.TOKENS) ? process.env.TOKENS : 500
 
 // Test prompt for single call model.
-const prompt = "Select any unique word related to Google and create a fun initialism, then explain it."
+const prompt = "Please tell me a unique funny joke. Then explain the joke."
 
 // Initialize Google Generative AI and pass in API key.
 const geminiAI = new GoogleGenerativeAI(process.env.API_KEY)
