@@ -10,6 +10,11 @@ const mime = require('mime-types')
 const readline = require("readline")
 const { GoogleGenerativeAI } = require("@google/generative-ai")
 let generativeModel = "gemini-pro"
+const colors = {
+  reset: "\x1b[0m",
+  yellow: "\x1b[33m",
+  magenta: "\x1b[35m",
+}
 
 // Get command-cine argument.
 const [arg1] = process.argv.slice(2)
@@ -105,8 +110,7 @@ const test = async (prompt) => {
       const reply = result.response.text()
   
       // Display prompt and reply.
-      console.log(`\nPrompt: ${prompt}`)
-      console.log(`Response: ${reply}\n`)
+      console.log(`\n${colors.magenta}AI >${colors.reset} ${reply}\n`)
       process.exit(0)
     }
   } catch (error) {
@@ -142,7 +146,7 @@ const chat = async () => {
       console.log("\n\n ==> Type 'exit' to quit.\n")
     }
 
-    read.question("Enter a prompt > ", async (msg) => {
+    read.question(`${colors.yellow}Enter a prompt >${colors.reset} `, async (msg) => {
       // Type exit to quit.
       if (msg.toLowerCase() === "exit") {
         read.close()
@@ -154,9 +158,13 @@ const chat = async () => {
         const generateResult = await chatSession.sendMessageStream(msg)
         let text = ""
 
+        if (!text) {
+          console.log(`\n${colors.magenta}AI >${colors.reset} `)
+        }
+
         for await (const chunk of generateResult.stream) {
           const response = chunk.text()
-          console.log(`\nAI > ${response}\n`)
+          console.log(`${response}`)
           text += response
         }
 
@@ -242,8 +250,8 @@ const img = async () => {
         const reply = result.response.text()
     
         // Display prompt and reply.
-        console.log(`\nPrompt: ${prompt}`)
-        console.log(`Response: ${reply}\n`)
+        console.log(`\n${colors.yellow}Prompt >${colors.reset} ${prompt}\n`)
+        console.log(`\n${colors.magenta}AI >${colors.reset} ${reply}\n`)
         process.exit(0)
       }
     } else {
