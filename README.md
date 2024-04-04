@@ -1,11 +1,12 @@
-# Personal Gemini AI Chat
+# Terminal Gemini AI Chat
 
 Use the terminal to interact with Google's Gemini AI.
 
 ## Features
 
+- Runs on Windows, Mac, and Linux
 - Test command ` npm run test ` - Gemini will tell you a joke and explain it
-  - The joke is never funny, while the explanations are
+  - The jokes are rarely funny, while the explanations often are
 - Chat command ` npm run chat ` - Activates the interactive chat prompt
   - Use cases: Ask a question, code review/help, write an article, research
   - Type 'exit' to quit, or press CTRL/CMD+C
@@ -21,7 +22,17 @@ To skip this step manually create a ` .env ` file, then add the API KEY variable
 
 ```js
 API_KEY=your-api-key
+TOKENS=500
+TEMPERATURE=0.9
+TOPP=0.95
+TOPK=3
 ```
+
+### Tokens
+
+By default max tokens is set to 500, which is about 35,000 words.
+
+A token is equivalent to about 4 characters. 100 tokens are about 60-80 English words.
 
 ## Requirements
 
@@ -85,4 +96,4 @@ Use at your own risk. The Gemini Chat script comes with ABSOLUTELY NO WARRANTY, 
 
 ## License
 
-Gemini Chat script is distributed under [Apache 2.0 License](https://github.com/ChrisWinters/gemini-chat/blob/main/LICENSE)
+Distributed under [Apache 2.0 License](https://github.com/ChrisWinters/gemini-chat/blob/main/LICENSE)
