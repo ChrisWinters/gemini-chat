@@ -9,7 +9,7 @@ const inquirer = require("inquirer")
 const mime = require('mime-types')
 const readline = require("readline")
 const { GoogleGenerativeAI } = require("@google/generative-ai")
-let generativeModel = "gemini-pro"
+const prompt = "Please tell me a unique funny joke. Then explain the joke."
 const colors = {
   reset: "\x1b[0m",
   yellow: "\x1b[33m",
@@ -29,21 +29,35 @@ if (!arg1 || (!arg1.includes("-t") && !arg1.includes("-c") && !arg1.includes("-i
   process.exit(0)
 }
 
+// Model name for text prompts.
+let generativeModel = "gemini-pro"
+
+// Model name for text/image prompts.
 if (arg1.includes("-i")) {
   generativeModel = "gemini-pro-vision"
 }
 
-// Maximum tokens to use for API replies.
+// Model parameters for generationConfig and .env file.
+const apiKey = (process.env.API_KEY) ? process.env.API_KEY.toString() : null
 const maxTokens = (process.env.TOKENS) ? process.env.TOKENS : 500
+const temperature = (process.env.TEMPERATURE) ? process.env.TEMPERATURE : 0.9
+const topP = (process.env.TOPP) ? process.env.TOPP : 0.95
+const topK = (process.env.TOPK) ? process.env.TOPK : 3
 
-// Test prompt for single call model.
-const prompt = "Please tell me a unique funny joke. Then explain the joke."
+// Configuration options for model generation and outputs.
+const generationConfig = {
+  stopSequences: ["aoeu"],
+  maxOutputTokens: Number(maxTokens),
+  temperature: Number(temperature),
+  topP: Number(topP),
+  topK: Number(topK),
+}
 
 // Initialize Google Generative AI and pass in API key.
-const geminiAI = new GoogleGenerativeAI(process.env.API_KEY)
+const geminiAI = new GoogleGenerativeAI(apiKey)
 
 // Create GenerativeModel instance for the provided model name.
-const model = geminiAI.getGenerativeModel({ model: generativeModel})
+const model = geminiAI.getGenerativeModel({ model: generativeModel}, generationConfig)
 
 /**
  * Run Questions and Answers prompt.
@@ -65,11 +79,12 @@ const inquirerPrompt = async (questions) => {
 /**
  * API Key missing: Inquirer about API Key and maybe create .env file.
  */
-const apiKey = async () => {
+const createEnv = async () => {
   console.log("\nEnter a Google Generative AI API Key then press enter.")
   console.log("Create API Key: https://aistudio.google.com/app/apikey\n")
 
-  const answer = inquirerPrompt({
+  // Run Questions and Answers prompt. Launch the inquire prompt interface.
+  const answer = await inquirerPrompt({
     type: "input",
     name: "api_key",
     message: "API Key >"
@@ -78,9 +93,15 @@ const apiKey = async () => {
   // If API Key was provided.
   if (answer['api_key'].length) {
     const apiKey = answer['api_key'].toString()
+    const apiKeyStr = `API_KEY=${apiKey}\n`
+    const tokensStr = `TOKENS=${Number(maxTokens)}\n`
+    const tempStr = `TEMPERATURE=${Number(temperature)}\n`
+    const topPStr = `TOPP=${Number(topP)}\n`
+    const topKStr = `TOPK=${Number(topK)}`
+    const content = apiKeyStr+tokensStr+tempStr+topPStr+topKStr
 
     // Asynchronously writes data to a file, replacing the file if it already exists.
-    fs.writeFile('.env', `API_KEY=${apiKey}\nTOKENS=${maxTokens}`, (error) => {
+    fs.writeFile('.env', content, (error) => {
       if (error) {
         console.log("\nNo action taken: Unable to create .env file.\n")
       } else {
@@ -127,9 +148,7 @@ const chat = async () => {
   // Start new ChatSession instance used for multi-turn chats.
   const chatSession = model.startChat({
     history: [],
-    generationConfig: {
-      maxOutputTokens: maxTokens,
-    }
+    generationConfig
   })
 
   // Creates a new readline interface instance.
@@ -385,8 +404,8 @@ const zip = () => {
  */
 const init = () => {
   // API Key Required.
-  if (!process.env.API_KEY) {
-    apiKey()
+  if (!apiKey) {
+    createEnv()
     return
   }
 
