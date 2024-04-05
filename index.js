@@ -298,6 +298,8 @@ const zip = () => {
   const packageLockStream = fs.createReadStream(packageLockFile)
   const licenseFile = path.resolve(__dirname,'LICENSE')
   const licenseStream = fs.createReadStream(licenseFile)
+  const testImage = path.resolve(__dirname,'images/test.png')
+  const imageStream = fs.createReadStream(testImage)
 
   // Verify index.js exists.
   indexStream.on('error', function(error) {
@@ -363,6 +365,7 @@ const zip = () => {
   archive.append(packageStream, { name: 'package.json' })
   archive.append(packageLockStream, { name: 'package-lock.json' })
   archive.append(licenseStream, { name: 'LICENSE' })
+  archive.append(imageStream, { name: 'images/test.png' })
 
   // Stat failures and other non-blocking errors.
   archive.on("warning", function (error) {
