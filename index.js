@@ -294,7 +294,7 @@ const zip = () => {
   const indexStream = fs.createReadStream(indexFile)
   const packageFile = path.resolve(__dirname,'package.json')
   const packageStream = fs.createReadStream(packageFile)
-  const packageLockFile = path.resolve(__dirname,'package-cock.json')
+  const packageLockFile = path.resolve(__dirname,'package-lock.json')
   const packageLockStream = fs.createReadStream(packageLockFile)
   const licenseFile = path.resolve(__dirname,'LICENSE')
   const licenseStream = fs.createReadStream(licenseFile)
@@ -361,7 +361,7 @@ const zip = () => {
   // Append files from a sub-directory, putting its contents at the root of archive.
   archive.append(indexStream, { name: 'index.js' })
   archive.append(packageStream, { name: 'package.json' })
-  archive.append(packageLockStream, { name: 'package-cock.json' })
+  archive.append(packageLockStream, { name: 'package-lock.json' })
   archive.append(licenseStream, { name: 'LICENSE' })
 
   // Stat failures and other non-blocking errors.
